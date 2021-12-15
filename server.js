@@ -27,7 +27,11 @@ var io = require('socket.io')(http,{
 
 const usersRouter = require('./routes/users');
 const homeRouter = require('./routes/home');
+const documentRouter = require('./routes/documents');
+const roleRouter = require('./routes/role');
 app.use('/users',usersRouter);
+app.use('/document',documentRouter);
+app.use('/role',roleRouter);
 app.use('/',homeRouter);
 
 
@@ -45,9 +49,5 @@ http.listen(port , ()=>{
 //     });
 // });
 
-io.on("connection", socket => {
-    socket.on("private message", (anotherSocketId, msg) => {
-      socket.to(anotherSocketId).emit("private message", socket.id, msg);
-    });
-  });
+
 

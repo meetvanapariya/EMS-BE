@@ -112,6 +112,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     default:null
   },
+  is_delete : {
+    type: Boolean
+  },
   email: {type: String, lowercase: true, unique: true, required: [true, "can't be blank"], match: [/\S+@\S+\.\S+/, 'is invalid'], index: true},
   password: { type: String },
   token: { type: String },

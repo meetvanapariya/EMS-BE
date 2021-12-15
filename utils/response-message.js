@@ -21,6 +21,8 @@ const errorMessages =  {
     accessTokenRequire : 'Require Access Token',
     accesstokenInvalid : 'Access token invalid',
     accessTokenExpire : 'Access token expired',
+    noRole : 'No role available',
+    invalidRole : 'You do not have Access permission',
 	noError : '',
 };
 

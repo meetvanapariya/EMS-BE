@@ -14,7 +14,7 @@ const verifyToken = (req, res, next) => {
   }
   try {
     const decoded = jwt.verify(token, config.TOKEN_KEY);
-    req.user = decoded;
+    res.locals.user = decoded;
   } catch (err) {
     return jsonResponse(res, responseCodes.Unauthorized, errorMessages.accesstokenInvalid, {} );
   }
