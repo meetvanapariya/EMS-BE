@@ -3,11 +3,11 @@ const cors = require('cors');
 require('dotenv').config();
 require('./config/passport');
 require("./config/database").connect();
-
+// require("./cron-birthday-mail");
 const app = express();
 app.use(cors());
 app.use(express.json());
-
+app.use('/uploads',express.static('uploads'));
 const port = process.env.PORT || 5000;
 var http = require('http').createServer(app);
 var io = require('socket.io')(http,{

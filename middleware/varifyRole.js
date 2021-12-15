@@ -8,7 +8,7 @@ const verifyRole = (req, res, next) => {
     // console.log(req);
     try {
         if(res.locals.user.user_id){
-            console.log(req.originalUrl);
+            // console.log(req.originalUrl);
             User.findOne({user_id: res.locals.user.user_id},{user_role:1})
            .then(user => {
                if(user.user_role){

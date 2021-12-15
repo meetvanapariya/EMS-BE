@@ -8,6 +8,7 @@ const successMessages  = {
     Create : "Successfully Created !",
     Update: "Successfully Updated !",
     Delete: "Successfully Deleted !",
+    profileSaved : 'Profile updated successfully',
     Fetch : "Success!"	
 };
 
@@ -22,6 +23,7 @@ const errorMessages =  {
     accesstokenInvalid : 'Access token invalid',
     accessTokenExpire : 'Access token expired',
     noRole : 'No role available',
+    noEmailFound : 'Email address not found',
     invalidRole : 'You do not have Access permission',
 	noError : '',
 };

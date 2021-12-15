@@ -9,6 +9,19 @@ const jsonResponse = require('../utils/json-response');
 const responseCodes = require('../helpers/response-codes');
 const {successMessages , errorMessages }  = require('../utils/response-message');
 
+const multer  = require('multer');
+
+const storage = multer.diskStorage({
+    destination : function(req,file,cb){
+      cb(null,'./uploads/profile/')
+    },
+    filename : function(req,file,cb){
+      cb(null,new Date().toISOString()+file.originalname);
+    }
+}) 
+
+const upload = multer({storage:storage})
+
 router.route('/').get(auth, (req,res) =>{
     User.find()
     .then(users => {
@@ -136,4 +149,47 @@ router.route('/login').post( async (req,res)=>{
     return jsonResponse(res, responseCodes.Invalid, errorMessages.invalidPassword, {});
 });
 
+router.route('/profile').post(upload.single('profile-pic'),async (req,res) =>{
+  const file = req.file;
+    const { user_id } = req.body;
+    if (!(user_id)) {
+        return jsonResponse(res, responseCodes.BadRequest,errorMessages.missingParameter,{})
+    }
+    User.findByIdAndUpdate(user_id ,{profile_image : file.path}) 
+    .then(() => {
+      return jsonResponse(res, responseCodes.OK, errorMessages.noError, {}, successMessages.profileSaved);
+    }).catch(err => jsonResponse(res, responseCodes.Invalid, err , {}))
+});
+
+router.route('/forget-password').post(async (req,res) => {
+  const { email } = req.body;
+  if (!(email)) {
+    return jsonResponse(res, responseCodes.Invalid, errorMessages.missingParameter, {});
+   }
+   const response = await User.findOne({email});
+   if(response){
+     if(response.email == email){
+      const token = generateToken(response._id, response.email);
+      const link = `www.xyz.com/reset-password?token=${token}&id=${response._id}`;
+      return jsonResponse(res, responseCodes.OK, errorMessages.noError,link, successMessages.ForgotPassword);
+     }else{
+      return jsonResponse(res, responseCodes.Invalid, errorMessages.noEmailFound, {});   
+     }
+   }else{
+    return jsonResponse(res, responseCodes.Invalid, errorMessages.noEmailFound, {});
+   }
+})
+
+router.route('/reset-password').post(auth , async (req,res) => {
+  const { password , user_id , token} = req.body;
+  if (!(password && user_id && token)) {
+    return jsonResponse(res, responseCodes.Invalid, errorMessages.missingParameter, {});
+   }
+   encryptedPassword = await bcrypt.hash(password, 10);
+
+   User.findByIdAndUpdate(user_id ,{password : encryptedPassword , resetPasswordToken : token}) 
+   .then(() => {
+     return jsonResponse(res, responseCodes.OK, errorMessages.noError, {}, successMessages.Update);
+   }).catch(err => jsonResponse(res, responseCodes.Invalid, err , {}))
+})
 module.exports = router;

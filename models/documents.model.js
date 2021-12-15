@@ -22,6 +22,10 @@ const documentSchema = new mongoose.Schema({
     folder_name :{
         type : String
     } , 
+    is_delete :{
+        type:Boolean,
+        default:false
+    }
 },{timestamps:true});
 
 const Document = mongoose.model("Document", documentSchema);

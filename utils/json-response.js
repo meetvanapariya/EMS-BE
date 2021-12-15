@@ -16,3 +16,5 @@ module.exports = function(res, status, error, payload, message ='') {
 		status: status.toString()
 	}));
 };
+
+
