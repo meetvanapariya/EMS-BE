@@ -1,53 +1,40 @@
-const express = require('express');
-const cors = require('cors');
-require('dotenv').config();
-require('./config/passport');
-require("./config/database").connect();
-// require("./cron-birthday-mail");
+import express from "express";
+import { connectDB } from "./config/dbConnection.js";
+import morgan from "morgan";
+import bodyParser from "body-parser";
+import { errorHandler, notFound } from "./middlewares/errorMiddleware.js";
+import cors from 'cors';
+import { PORT } from "./config/environmentVariables.js";
+
+connectDB();
+
+// initializing our Express application here.
 const app = express();
 app.use(cors());
-app.use(express.json());
 app.use('/uploads',express.static('uploads'));
-const port = process.env.PORT || 5000;
-var http = require('http').createServer(app);
-var io = require('socket.io')(http,{
-    cors: {
-        origin: '*',
-    }
+// database connection
+
+
+//  middleware
+app.use(bodyParser.json());
+app.use(morgan("dev"));
+
+//import router
+import userRoute from "./routes/userRoute.js";
+import documentRoute from "./routes/documentRoute.js";
+import leaveRoute from "./routes/leaveRoute.js";
+// api calls
+app.use("/api/user/", userRoute);
+app.use("/api/document/", documentRoute);
+app.use("/api/leave/", leaveRoute);
+// error handling
+app.use(notFound);
+app.use(errorHandler);
+
+// define port number
+const port = PORT;
+
+// listening port
+app.listen(port, () => {
+  console.log(`server is up and running on port: ${port}.`);
 });
-
-// //mongo db connected
-// const uri = process.env.ATLAS_URI;
-// mongoose.connect(uri);
-// const connection = mongoose.connection;
-// connection.once('open', () => {
-//     console.log('mongoose connected successfully');
-// })
-
-
-const usersRouter = require('./routes/users');
-const homeRouter = require('./routes/home');
-const documentRouter = require('./routes/documents');
-const roleRouter = require('./routes/role');
-app.use('/users',usersRouter);
-app.use('/document',documentRouter);
-app.use('/role',roleRouter);
-app.use('/',homeRouter);
-
-
-
-http.listen(port , ()=>{
-    console.log(`server is running on port ${port}`);
-}); 
-
-
-// io.on('connection', (socket) => { 
-//     console.log('new client connected' , socket.id);
-//     socket.on(socket.username ,(payload) =>{
-//         console.log("what is payload",payload);
-//         io.emit(socket.username,payload);
-//     });
-// });
-
-
-

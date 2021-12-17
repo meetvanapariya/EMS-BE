@@ -1,5 +1,5 @@
-'use strict';
-module.exports = {
+import express from "express";
+const codes = {
 	OK: 200,
 	EntryCreated: 201,
 	BadRequest: 400,
@@ -15,3 +15,5 @@ module.exports = {
 	S3Bucket:408,
 	DBOperation:410
 };
+
+export default codes;

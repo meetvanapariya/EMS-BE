@@ -1,5 +1,5 @@
-'use strict';
-const successMessages  = {
+import express from "express";
+export const successMessages  = {
     Login: "Successfully logged in",
     Logout: "Successfully logout user",
     Register: "Successfully register new user",
@@ -12,7 +12,7 @@ const successMessages  = {
     Fetch : "Success!"	
 };
 
-const errorMessages =  {
+export const errorMessages =  {
 	missingParameter : 'There are one or more parameters missing in the supplied request',
 	duplicateUser: ' Duplicate user in database',
 	dbOperationError: 'Database operation error' ,
@@ -28,4 +28,3 @@ const errorMessages =  {
 	noError : '',
 };
 
-module.exports = {successMessages , errorMessages};
