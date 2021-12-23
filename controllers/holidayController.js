@@ -1,34 +1,11 @@
-import { Leave } from "../models/leaveModel.js";
+import { Holiday } from "../models/holidayModel.js";
 import jsonResponse from "../utils/json-response.js";
 import responseCodes from "../helpers/response-codes.js";
 import { successMessages, errorMessages } from "../utils/response-message.js";
 
-export const addLeave = async (req, res) => {
-  const {
-    user_id,
-    email,
-    username,
-    leave_type,
-    from_date,
-    to_date,
-    number_of_days,
-    remaining_leave,
-    leave_reason,
-    approved_by_id,
-    leave_day_type,
-    status,
-  } = req.body;
-  if (
-    !(
-      user_id &&
-      email &&
-      username &&
-      leave_type &&
-      from_date &&
-      to_date &&
-      leave_reason
-    )
-  ) {
+export const addHoliday = async (req, res) => {
+  const { holiday_name, holiday_date } = req.body;
+  if (!(holiday_name && holiday_date)) {
     return jsonResponse(
       res,
       responseCodes.BadRequest,
@@ -36,21 +13,11 @@ export const addLeave = async (req, res) => {
       {}
     );
   }
-  const newLeave = new Leave({
-    user_id,
-    email,
-    username,
-    leave_type,
-    from_date,
-    to_date,
-    number_of_days,
-    remaining_leave,
-    leave_reason,
-    approved_by_id: "",
-    leave_day_type,
-    status,
+  const newHoliday = new Holiday({
+    holiday_name,
+    holiday_date,
   });
-  newLeave
+  newHoliday
     .save()
     .then(() => {
       return jsonResponse(
@@ -64,32 +31,32 @@ export const addLeave = async (req, res) => {
     .catch((err) => jsonResponse(res, responseCodes.Invalid, err, {}));
 };
 
-export const getLeave = async (req, res) => {
-  const { user_id } = req.params;
-  if (!user_id) {
-    return jsonResponse(
-      res,
-      responseCodes.BadRequest,
-      errorMessages.missingParameter,
-      {}
-    );
-  }
-  Leave.find({ user_id: user_id })
-    .then((leaves) => {
+export const getHoliday = async (req, res) => {
+  //   const { user_id } = req.params;
+  //   if (!user_id) {
+  //     return jsonResponse(
+  //       res,
+  //       responseCodes.BadRequest,
+  //       errorMessages.missingParameter,
+  //       {},
+  //     );
+  //   }
+  Holiday.find()
+    .then((holidays) => {
       return jsonResponse(
         res,
         responseCodes.OK,
         errorMessages.noError,
-        leaves,
+        holidays,
         successMessages.Create
       );
     })
     .catch((err) => jsonResponse(res, responseCodes.Invalid, err, {}));
 };
 
-export const editLeave = async (req, res) => {
-  const { leave_id } = req.params;
-  if (!leave_id) {
+export const editHoliday = async (req, res) => {
+  const { holiday_id } = req.params;
+  if (!holiday_id) {
     return jsonResponse(
       res,
       responseCodes.BadRequest,
@@ -97,7 +64,7 @@ export const editLeave = async (req, res) => {
       {}
     );
   }
-  await Leave.findByIdAndUpdate({ _id: leave_id }, req.body)
+  await Holiday.findByIdAndUpdate({ _id: holiday_id }, req.body)
     .then(() => {
       return jsonResponse(
         res,
@@ -110,7 +77,7 @@ export const editLeave = async (req, res) => {
     .catch((err) => jsonResponse(res, responseCodes.Invalid, err, {}));
 };
 
-export const filterLeave = async (req, res) => {
+export const filterHoliday = async (req, res) => {
   const { user_id } = req.body;
   if (!user_id) {
     return jsonResponse(

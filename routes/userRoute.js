@@ -1,8 +1,5 @@
 import express from "express";
-// importing signup controller.
-// import jsonResponse from '../utils/json-response';
-// import responseCodes from '../helpers/response-codes';
-// import {successMessages , errorMessages }  from '../utils/response-message';
+const router = express.Router();
 
 import {
   registerUser,
@@ -13,77 +10,42 @@ import {
   updateUser,
   updateProfilePic,
   forgetPassword,
-  resetPassword
+  resetPassword,
+  logOut
 } from "../controllers/userController.js";
 import { verifyToken } from "../middlewares/tokenAuth.js";
 import {
   userRegisterValidators,
   userLoginValidators,
+  userLogoutValidators
 } from "../validators/auth.js";
 import { runValidate } from "../validators/index.js";
 
-const router = express.Router();
-
-
-import multer from 'multer';
+import multer from "multer";
+import { canAccess } from "../middlewares/roleAuth.js";
 const storage = multer.diskStorage({
-    destination : function(req,file,cb){
-      cb(null,'./uploads/profile/')
-    },
-    filename : function(req,file,cb){
-      cb(null,new Date().toISOString()+file.originalname);
-    }
-}) 
-const upload = multer({storage:storage})
+  destination: function (req, file, cb) {
+    cb(null, "./uploads/profile/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, new Date().toISOString() + file.originalname);
+  },
+});
+const upload = multer({ storage: storage });
 
 
-router.post(
-  "/register",
-  userRegisterValidators,
-  runValidate,
-  registerUser
-);
-router.post(
-  "/login",
-  userLoginValidators,
-  runValidate,
-  loginUser
-);
 
-router.get(
-  "/get/:userId", 
-  getUser
-);
+router.get("/get/:userId", verifyToken, canAccess, getUser);
+router.get("/all", verifyToken,canAccess, getAllUsers);
 
-router.get(
-  "/all",
-  verifyToken,
-  getAllUsers
-);
+router.patch("/delete/:userId", verifyToken, canAccess, deleteUser);
+router.patch("/update/:userId", verifyToken, canAccess, upload.single("profile-pic") ,updateUser);
 
-router.patch(
-  "/delete/:userId", 
-  deleteUser
-);
-router.patch(
-  "/update/:userId", 
-  updateUser
-);
+router.post("/profile", upload.single("profile-pic"), updateProfilePic);
+router.post("/register", userRegisterValidators, runValidate, registerUser);
+router.post("/login", userLoginValidators, runValidate, loginUser);
+router.post("/logout",userLogoutValidators ,runValidate , logOut);
+router.post("/forget-password", forgetPassword);
+router.post("/reset-password",verifyToken, resetPassword);
 
-
-router.post(
-  "/profile",
-  upload.single('profile-pic'),
-  updateProfilePic
-);
-
-router.post(
-  "/forget-password",
-  forgetPassword
-);
-
-router.post(
-  "/reset-password",
-  resetPassword
-);
 export default router;

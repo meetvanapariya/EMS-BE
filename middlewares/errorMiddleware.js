@@ -1,10 +1,12 @@
 import { NODE_ENV } from "../config/environmentVariables.js";
+import jsonResponse from '../utils/json-response.js';
+import responseCodes from '../helpers/response-codes.js';
+import {successMessages , errorMessages }  from '../utils/response-message.js';
+
 
 export const notFound = (req, res, next) => {
-  res.status(404).json({
-    error: `Not Found - ${req.originalUrl}`,
-  });
-  next(error);
+  jsonResponse(res, responseCodes.ResourceNotFound,'End point not found', {});
+  // next(error);
 };
 
 export const errorHandler = (err, req, res, next) => {

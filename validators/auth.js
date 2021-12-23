@@ -31,3 +31,10 @@ export const userLoginValidators = [
     .isLength({ min: 4 })
     
 ];
+
+
+export const userLogoutValidators = [
+  check("user_id", "Require user ID")
+  .not()
+  .isEmpty()
+];

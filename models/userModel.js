@@ -18,8 +18,8 @@ const userSchema = new mongoose.Schema(
     },
     user_role: {
       type: String,
-      enum: ["Admin", "PM", "Team Leader", "Developer"],
-      default: "Admin",
+      enum: ["Admin", "Manager", "Team Leader", "Developer", "HR"],
+      default: "Developer",
     },
     user_role_id: {
       type: String,
@@ -93,7 +93,7 @@ const userSchema = new mongoose.Schema(
     },
     user_designation: {
       type: String,
-      default: "React.js Developer",
+      default: "Developer",
     },
     resetPasswordToken: {
       type: String,
@@ -119,6 +119,7 @@ const userSchema = new mongoose.Schema(
       match: [/\S+@\S+\.\S+/, "is invalid"],
       index: true,
     },
+    meta : mongoose.Schema.Types.Mixed,
     password: { type: String },
     token: { type: String },
     paranoid: {
@@ -126,23 +127,27 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
   },
-  { timestamps: true }
+  { timestamps: true , strict: false}
 );
 
-// userSchema.pre("save", async function (next) {
-//   if (!this.isModified("password")) {
-//     next();
-//   }
-//   const salt = await bcrypt.genSalt(10);
-//   this.password = await bcrypt.hash(this.password, salt);
+userSchema.pre("save", async function (next) {
+  this.permanent_address = encryptAES(this.permanent_address);
+  this.current_address = encryptAES(this.current_address);
+  this.adharaCard_no = encryptAES(this.adharaCard_no);
+  this.bank_ac = encryptAES(this.bank_ac);
+  this.phone = encryptAES(this.phone);
+  this.alternate_mobile_no = encryptAES(this.alternate_mobile_no);
+});
 
-//   this.permanent_address = encryptAES(this.permanent_address);
-//   this.current_address = encryptAES(this.current_address);
-//   this.adharaCard_no = encryptAES(this.adharaCard_no);
-//   this.bank_ac = encryptAES(this.bank_ac);
-//   this.phone = encryptAES(this.phone);
-//   this.alternate_mobile_no = encryptAES(this.alternate_mobile_no);
-// });
+userSchema.pre("findOneAndUpdate", async function (next) {
+  console.log(this._update.current_address);
+  if(this._update.permanent_address) this._update.permanent_address = encryptAES(this._update.permanent_address);
+  if(this._update.current_address) this._update.current_address = encryptAES(this._update.current_address);
+  if(this._update.adharaCard_no) this._update.adharaCard_no = encryptAES(this._update.adharaCard_no);
+  if(this._update.bank_ac) this._update.bank_ac = encryptAES(this._update.bank_ac);
+  if(this._update.phone) this._update.phone = encryptAES(this._update.phone);
+  if(this._update.alternate_mobile_no) this._update.alternate_mobile_no = encryptAES(this._update.alternate_mobile_no);
+});
 
 // userSchema.methods.matchPassword = async function (enteredPassword) {
 //   return bcrypt.compare(enteredPassword, this.password); //here i have removed await

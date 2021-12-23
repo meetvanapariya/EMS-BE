@@ -25,6 +25,7 @@ export const errorMessages =  {
     noRole : 'No role available',
     noEmailFound : 'Email address not found',
     invalidRole : 'You do not have Access permission',
+    noData : 'No data found',
 	noError : '',
 };
 
