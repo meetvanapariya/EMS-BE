@@ -11,8 +11,8 @@ import { verifyToken } from "../middlewares/tokenAuth.js";
 
   
 router.post(
-    "/add",
-    addHoliday
+  "/add",
+  addHoliday
 )
 router.get(
   "/get",

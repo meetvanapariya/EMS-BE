@@ -69,7 +69,7 @@ export const registerUser = async (req, res) => {
           account_enabled : 'yes',
           profile_image,
           blood_group,
-          EMPID,
+          EMP_ID,
           phone,
           alternate_mobile_no,
           notes,
@@ -123,12 +123,12 @@ export const loginUser = async (req, res) => {
   User.findOne({ email }).exec(async (error, user) => {
     // checking if user is paranoid or not , if paranoid then return error message to client
     if (error || !user || !user.paranoid == false) {
-      return res.status(400).json({
-        error: error?.message,
-        payload: {},
-        message: "User with this email does not exist. Please register first",
-        status: 400,
-      });
+      return jsonResponse(
+        res,
+        responseCodes.BadRequest,
+        errorMessages.unverifiedUser,
+        {}
+      );
     }
     await User.findByIdAndUpdate({_id : user._id} , {last_login : new Date() , userStatus : 'active'})
     if (await bcrypt.compare(password, user.password)) {
@@ -267,9 +267,9 @@ export const getAllUsers = async (req, res) => {
     });
   } catch (error) {
     res.status(400).json({
-      error: error.message,
+      error: "some error occurred while fetching all users from database.",
       payload: {},
-      message: "some error occurred while fetching all users from database. ",
+      message: " ",
       status: 400,
     });
   }
@@ -305,9 +305,9 @@ export const getUser = async (req, res) => {
     }
   } catch (error) {
     res.status(400).json({
-      error: error.message,
+      error: "some error occurred while fetching user from database.",
       payload: {},
-      message: "some error occurred while fetching user from database. ",
+      message: "",
       status: 400,
     });
   }
@@ -383,6 +383,12 @@ export const updateUser = async (req, res) => {
           }
         }
         const userData = await User.findOne({ _id : userId})
+        userData.adharaCard_no = decryptionAES(userData.adharaCard_no);
+        userData.bank_ac = decryptionAES(userData.bank_ac);
+        userData.phone = decryptionAES(userData.phone);
+        userData.alternate_mobile_no = decryptionAES(userData.alternate_mobile_no);
+        userData.current_address = decryptionAES(userData.current_address);
+        userData.permanent_address = decryptionAES(userData.permanent_address);
         return res.json({
           error: "",
           payload: userData,
