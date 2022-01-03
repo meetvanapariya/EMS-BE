@@ -318,7 +318,7 @@ export const deleteUser = async (req, res) => {
   const { userId } = req.params;
   try {
     // try to find and softDelete user with provided user_id from database
-    const user = await User.findByIdAndUpdate({ _id: userId }, req.body);
+    const user = await User.findByIdAndUpdate({ _id: userId },{ paranoid : true});
 
     // if user not found in database then return error message to client
     if (!user) {

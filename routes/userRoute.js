@@ -39,9 +39,9 @@ router.get("/get/:userId", verifyToken, canAccess, getUser);
 router.get("/all", verifyToken,canAccess, getAllUsers);
 
 router.patch("/delete/:userId", verifyToken, canAccess, deleteUser);
-router.patch("/update/:userId", verifyToken, canAccess, upload.single("profile-pic") ,updateUser);
+router.patch("/update/:userId", verifyToken, canAccess, upload.single("profile_pic") ,updateUser);
 
-router.post("/profile", upload.single("profile-pic"), updateProfilePic);
+router.post("/profile", upload.single("profile_pic"), updateProfilePic);
 router.post("/register", userRegisterValidators, runValidate, registerUser);
 router.post("/login", userLoginValidators, runValidate, loginUser);
 router.post("/logout",userLogoutValidators ,runValidate , logOut);
