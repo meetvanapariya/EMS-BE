@@ -349,6 +349,7 @@ export const deleteUser = async (req, res) => {
 
 // Update user PATCH request controller
 export const updateUser = async (req, res) => {
+  // console.log(req.file);
   try {
     const { userId } = req.params;
     const file = req.file;

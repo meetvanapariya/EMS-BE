@@ -5,6 +5,7 @@ import responseCodes from "../helpers/response-codes.js";
 import { successMessages, errorMessages } from "../utils/response-message.js";
 
 export const verifyToken = (req, res, next) => {
+  console.log('req>>>>', req.body);
   const token =
     req.body.token || req.query.token || req.headers["x-access-token"];
   if (!token) {
