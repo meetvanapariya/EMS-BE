@@ -329,11 +329,11 @@ export const deleteUser = async (req, res) => {
         status: 400,
       });
     }
-
+    const allUser = await User.find({ paranoid: false });
     // if user is successfully soft deleted then return success message to client
     return res.json({
       error: "",
-      payload: user,
+      payload: allUser,
       message: "User deleted successfully.",
       status: 200,
     });
