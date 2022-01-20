@@ -34,7 +34,7 @@ export const registerUser = async (req, res) => {
     bank_ac,
     email,
     password,
-    meta
+    meta,
   } = req.body;
   try {
     User.findOne({ email }).exec(async (err, user) => {
@@ -61,28 +61,28 @@ export const registerUser = async (req, res) => {
         const newUser = await User.create({
           first_name,
           last_name,
-          username : first_name+last_name,
+          username: `${first_name} ${last_name}`,
           user_role,
           user_role_id,
           current_address,
           permanent_address,
-          account_enabled : 'yes',
+          account_enabled: "yes",
           profile_image,
           blood_group,
           EMP_ID,
           phone,
           alternate_mobile_no,
           notes,
-          notify_online : 'yes',
+          notify_online: "yes",
           employment_start_date,
           employment_end_date,
           user_birth_date,
           last_login,
-          status : '',
+          status: "",
           user_department,
           user_designation,
-          resetPasswordToken : '',
-          resetPasswordExpires : '',
+          resetPasswordToken: "",
+          resetPasswordExpires: "",
           adharcard_no,
           meta,
           bank_ac,
@@ -130,7 +130,10 @@ export const loginUser = async (req, res) => {
         {}
       );
     }
-    await User.findByIdAndUpdate({_id : user._id} , {last_login : new Date() , userStatus : 'active'})
+    await User.findByIdAndUpdate(
+      { _id: user._id },
+      { last_login: new Date(), userStatus: "active" }
+    );
     if (await bcrypt.compare(password, user.password)) {
       const token = generateToken(user._id, email, user.user_role);
       user.current_address = decryptionAES(user.current_address);
@@ -161,34 +164,46 @@ export const loginUser = async (req, res) => {
 // logout POST request controller
 export const logOut = async (req, res) => {
   const { user_id } = req.body;
-  User.findByIdAndUpdate({ _id : user_id} , {userStatus : 'inactive'})
-  .then(() => {
-    return jsonResponse(
-      res,
-      responseCodes.OK,
-      errorMessages.noError,
-      {},
-      successMessages.Logout
-    );
-  })
-  .catch((err) => jsonResponse(res, responseCodes.Invalid, err, {}));
-  
+  User.findByIdAndUpdate({ _id: user_id }, { userStatus: "inactive" })
+    .then(() => {
+      return jsonResponse(
+        res,
+        responseCodes.OK,
+        errorMessages.noError,
+        {},
+        successMessages.Logout
+      );
+    })
+    .catch((err) => jsonResponse(res, responseCodes.Invalid, err, {}));
 };
 
 // getAllUser GET request controller
 export const getAllUsers = async (req, res) => {
+  const { search_by_name, search_by_role } = req.query;
+  const query = {
+    paranoid: false,
+  };
+  if (search_by_name) {
+    query["$or"] = [
+      { first_name: search_by_name },
+      { last_name: search_by_name },
+    ];
+  }
+  if (search_by_role && search_by_role !== "All") {
+    query["user_role"] = search_by_role;
+  }
   try {
     // filtering out paranoid users
-    const user = await User.find({ paranoid: false });
+    const user = await User.find(query);
     // if user does not found then return error message
-    if (!user.length > 0) {
-      return res.status(400).json({
-        error: "No user found",
-        payload: {},
-        message: "",
-        status: 400,
-      });
-    }
+    // if (!user.length > 0) {
+    //   return res.status(400).json({
+    //     error: "No user found",
+    //     payload: {},
+    //     message: "",
+    //     status: 400,
+    //   });
+    // }
     // if user found who is not paranoid then decrypt its data
     let response = user.map(
       ({
@@ -221,7 +236,7 @@ export const getAllUsers = async (req, res) => {
         bank_ac,
         email,
         password,
-        meta
+        meta,
       }) => {
         let decUser = {
           _id,
@@ -253,7 +268,7 @@ export const getAllUsers = async (req, res) => {
           bank_ac: decryptionAES(bank_ac),
           email,
           password,
-          meta
+          meta,
         };
         return decUser;
       }
@@ -318,7 +333,10 @@ export const deleteUser = async (req, res) => {
   const { userId } = req.params;
   try {
     // try to find and softDelete user with provided user_id from database
-    const user = await User.findByIdAndUpdate({ _id: userId },{ paranoid : true});
+    const user = await User.findByIdAndUpdate(
+      { _id: userId },
+      { paranoid: true }
+    );
 
     // if user not found in database then return error message to client
     if (!user) {
@@ -329,11 +347,11 @@ export const deleteUser = async (req, res) => {
         status: 400,
       });
     }
-    const allUser = await User.find({ paranoid: false });
+
     // if user is successfully soft deleted then return success message to client
     return res.json({
       error: "",
-      payload: allUser,
+      payload: user,
       message: "User deleted successfully.",
       status: 200,
     });
@@ -349,45 +367,49 @@ export const deleteUser = async (req, res) => {
 
 // Update user PATCH request controller
 export const updateUser = async (req, res) => {
-  // console.log(req.file);
   try {
-    const { userId } = req.params;
     const file = req.file;
-    if(req.body.constructor === Object && Object.keys(req.body).length === 0) {
-      return jsonResponse(
-        res,
-        responseCodes.Invalid,
-        errorMessages.missingParameter,
-        {}
-      );
-    }
+    const { userId } = req.params;
+    const  userData  = req.body;
+    const userInfo = JSON.parse(JSON.stringify(userData));
+    // console.log(userInfo);
+    // if (userInfo.constructor === Object && Object.keys(userInfo).length === 0) {
+    //   return jsonResponse(
+    //     res,
+    //     responseCodes.Invalid,
+    //     errorMessages.missingParameter,
+    //     {}
+    //   );
+    // }
     // try to find user in db with provided user_id
     User.findById(userId).exec(async (err, user) => {
       //checking if user is paranoid then return not found message to client
       if (err || !user.paranoid == false) {
         return res.json({
-          error: err?.message,
+          error: '',
           payload: {},
           message: "User not found",
           status: 400,
         });
       }
-
       // checking if user is not paranoid then try to update user accordingly req.body
       if (user.paranoid == false) {
-        if(Object.keys(req.body).length > 0){
-          await User.findByIdAndUpdate({ _id: userId }, req.body);
+        if (Object.keys(userInfo).length > 0) {
+          await User.findByIdAndUpdate({ _id: userId }, userInfo);
         }
-        if(file){
-          if(file.path != ''){
-            await User.findByIdAndUpdate({ _id: userId },{ profile_image: file.path });
-          }
+        if (file) {
+          await User.findByIdAndUpdate(
+            { _id: userId },
+            { profile_image: file.path }
+          );
         }
-        const userData = await User.findOne({ _id : userId})
+        const userData = await User.findOne({ _id: userId });
         userData.adharaCard_no = decryptionAES(userData.adharaCard_no);
         userData.bank_ac = decryptionAES(userData.bank_ac);
         userData.phone = decryptionAES(userData.phone);
-        userData.alternate_mobile_no = decryptionAES(userData.alternate_mobile_no);
+        userData.alternate_mobile_no = decryptionAES(
+          userData.alternate_mobile_no
+        );
         userData.current_address = decryptionAES(userData.current_address);
         userData.permanent_address = decryptionAES(userData.permanent_address);
         return res.json({
@@ -399,14 +421,12 @@ export const updateUser = async (req, res) => {
       }
     });
   } catch (error) {
-    jsonResponse(res, responseCodes.Invalid, error, {})
+    jsonResponse(res, responseCodes.Invalid, error, {});
   }
 };
 
-
 export const updateProfilePic = async (req, res) => {
   const file = req.file;
-  console.log(file);
   const { user_id } = req.body;
   if (!user_id) {
     return jsonResponse(
@@ -480,25 +500,24 @@ export const resetPassword = async (req, res) => {
     );
   }
   const encryptedPassword = await bcrypt.hash(password, 10);
-  User.find({_id : user_id})
-  .then((userExist) => {
-    if(userExist){
-      User.findByIdAndUpdate(user_id, {
-        password: encryptedPassword,
-        resetPasswordToken: token,
-      })
-      .then(() => {
-          return jsonResponse(
-            res,
-            responseCodes.OK,
-            errorMessages.noError,
-            {},
-            successMessages.Update
-          );
-      })
-      .catch((err) => jsonResponse(res, responseCodes.Invalid, err, {}));
-    }
-  }).catch((err) => jsonResponse(res, responseCodes.Invalid, err, {}));
- 
- 
+  User.find({ _id: user_id })
+    .then((userExist) => {
+      if (userExist) {
+        User.findByIdAndUpdate(user_id, {
+          password: encryptedPassword,
+          resetPasswordToken: token,
+        })
+          .then(() => {
+            return jsonResponse(
+              res,
+              responseCodes.OK,
+              errorMessages.noError,
+              {},
+              successMessages.Update
+            );
+          })
+          .catch((err) => jsonResponse(res, responseCodes.Invalid, err, {}));
+      }
+    })
+    .catch((err) => jsonResponse(res, responseCodes.Invalid, err, {}));
 };

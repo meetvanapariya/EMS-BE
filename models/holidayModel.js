@@ -11,6 +11,10 @@ const holidaySchema = new mongoose.Schema(
       type: Date,
       default: "",
     },
+    isDelete: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

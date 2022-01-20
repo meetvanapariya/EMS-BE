@@ -15,6 +15,7 @@ app.use("/uploads", express.static("uploads"));
 // database connection
 
 // MIDDLEWARE
+
 app.use(bodyParser.json());
 app.use(morgan("dev"));
 

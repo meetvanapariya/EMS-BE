@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 
 const documentSchema = new mongoose.Schema({
-   user_id : {
-       type : String,
-   },
-   document_name : {
-    type : String
+    user_id : {
+        type : String,
+    },
+    document_name : {
+        type : String
     },
     document_type : {
         type : String
@@ -15,7 +15,7 @@ const documentSchema = new mongoose.Schema({
     },
     document_img : {
         type : String
-    } ,
+    },
     s3_location :{
         type : String
     } ,

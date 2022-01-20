@@ -1,4 +1,5 @@
-import { check } from "express-validator";
+import pkg from "express-validator";
+const { check } = pkg;
 
 export const userRegisterValidators = [
   check("first_name", "First Name is required")
@@ -16,9 +17,8 @@ export const userRegisterValidators = [
   check(
     "password",
     "Please enter a password at least 8 character and contain At least one uppercase.At least one lower case.At least one special character. "
-  )
-    .isLength({ min: 4 }),
-    // .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[a-zA-Z\d@$.!%*#?&]/),
+  ).isLength({ min: 4 }),
+  // .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[a-zA-Z\d@$.!%*#?&]/),
   check("permanent_address", "Address is required").not().isEmpty(),
 ];
 
@@ -27,14 +27,9 @@ export const userLoginValidators = [
   check(
     "password",
     "Please enter a password at least 8 character and contain At least one uppercase.At least one lower case.At least one special character. "
-  )
-    .isLength({ min: 4 })
-    
+  ).isLength({ min: 4 }),
 ];
 
-
 export const userLogoutValidators = [
-  check("user_id", "Require user ID")
-  .not()
-  .isEmpty()
+  check("user_id", "Require user ID").not().isEmpty(),
 ];

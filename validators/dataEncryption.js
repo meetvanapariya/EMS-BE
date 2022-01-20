@@ -7,14 +7,18 @@ export const encryptAES = (data) => {
   return data;
 };
 export const decryptionAES = (data) => {
-  if (data) {
-    let bytes = CryptoJS.AES.decrypt(data, CRYPTO_KEY);
-    let decryptedText = bytes.toString(CryptoJS.enc.Utf8);
-    if (decryptedText) {
-      return decryptedText;
-    } else {
-      return '';
+  try {
+    if (data) {
+      let bytes = CryptoJS.AES.decrypt(data, CRYPTO_KEY);
+      let decryptedText = bytes.toString(CryptoJS.enc.Utf8);
+      if (decryptedText) {
+        return decryptedText;
+      } else {
+        return "";
+      }
     }
+    return data;
+  } catch (error) {
+    console.log({ error });
   }
-  return data;
 };

@@ -11,13 +11,13 @@ import {
   updateProfilePic,
   forgetPassword,
   resetPassword,
-  logOut
+  logOut,
 } from "../controllers/userController.js";
 import { verifyToken } from "../middlewares/tokenAuth.js";
 import {
   userRegisterValidators,
   userLoginValidators,
-  userLogoutValidators
+  userLogoutValidators,
 } from "../validators/auth.js";
 import { runValidate } from "../validators/index.js";
 
@@ -33,19 +33,23 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-
-
 router.get("/get/:userId", verifyToken, canAccess, getUser);
-router.get("/all", verifyToken,canAccess, getAllUsers);
+router.get("/all", verifyToken, canAccess, getAllUsers);
 
 router.patch("/delete/:userId", verifyToken, canAccess, deleteUser);
-router.patch("/update/:userId", verifyToken, canAccess, upload.single("profile_pic") ,updateUser);
+router.patch(
+  "/update/:userId",
+  verifyToken,
+  canAccess,
+  upload.single("profile_pic"),
+  updateUser
+);
 
 router.post("/profile", upload.single("profile_pic"), updateProfilePic);
 router.post("/register", userRegisterValidators, runValidate, registerUser);
 router.post("/login", userLoginValidators, runValidate, loginUser);
-router.post("/logout",userLogoutValidators ,runValidate , logOut);
+router.post("/logout", userLogoutValidators, runValidate, logOut);
 router.post("/forget-password", forgetPassword);
-router.post("/reset-password",verifyToken, resetPassword);
+router.post("/reset-password", verifyToken, resetPassword);
 
 export default router;

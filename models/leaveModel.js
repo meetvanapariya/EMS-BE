@@ -1,60 +1,75 @@
 import mongoose from "mongoose";
-const leaveSchema = new mongoose.Schema({
+const leaveSchema = new mongoose.Schema(
+  {
     user_id: {
       type: String,
-      default: ''
-    }, 
+      default: "",
+    },
     email: {
       type: String,
-      default: ''
-    }, 
+      default: "",
+    },
     username: {
       type: String,
-      default: ''
-    },    
+      default: "",
+    },
     leave_type: {
       type: String,
-      enum: ['CL', 'ML', 'LWP'],
-      default: ''
-    },  
+      enum: ["casual_leave", "maternity_leave", "medical_leave", "loss_of_pay"],
+      default: "",
+    },
     from_date: {
       type: Date,
-      default: ""
-    },    
+      default: "",
+    },
     to_date: {
       type: Date,
-      default: ""
-    },      
+      default: "",
+    },
     number_of_days: {
       type: String,
-      default: ''
-    },        
+      default: "",
+    },
     remaining_leave: {
       type: String,
-      default: ''
-    },    
+      default: "",
+    },
     leave_reason: {
       type: String,
-      default: ''
-    },   
+      default: "",
+    },
     approved_by_id: {
       type: String,
-      default: ''
-    },  
+      default: "",
+    },
     leave_day_type: {
       type: String,
-      enum: ['full', 'half'],
-      default: ''
+      enum: ["full", "half"],
+      default: "",
     },
     status: {
       type: String,
-      enum: ['new', 'pending', 'approved', 'declined','delete', 'partial_approved'],
-      default: 'new'
+      enum: [
+        "new",
+        "pending",
+        "approved",
+        "declined",
+        "delete",
+        "partial_approved",
+      ],
+      default: "new",
     },
     notes: {
       type: String,
-      default: ''
-    }
-},{timestamps:true});
+      default: "",
+    },
+    user_role: {
+      type: String,
+      enum: ["Admin", "Manager", "Team Leader", "Developer", "HR"],
+      default: "Developer",
+    },
+  },
+  { timestamps: true }
+);
 
 export const Leave = mongoose.model("Leave", leaveSchema);

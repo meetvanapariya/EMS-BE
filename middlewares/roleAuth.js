@@ -1,4 +1,4 @@
-import jwt, { decode } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../config/environmentVariables.js";
 import jsonResponse from "../utils/json-response.js";
 import { errorMessages } from "../utils/response-message.js";
@@ -10,7 +10,7 @@ export const canAccess = (req, res, next) => {
   next();
 };
 
-function isAuthenticatedRole(req) {
+export function isAuthenticatedRole(req) {
   const token =
     req.body.token || req.query.token || req.headers["x-access-token"];
   if (!token) {
@@ -28,4 +28,14 @@ function isAuthenticatedRole(req) {
     req.params.userId == decoded.id || decoded.role == "Admin"
   );
   return req.params.userId == decoded.id || decoded.role == "Admin";
+}
+
+export function user(req, res, next) {
+  const token =
+    req.body.token || req.query.token || req.headers["x-access-token"];
+  if (token) {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
+    next();
+  }
 }

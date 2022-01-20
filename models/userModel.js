@@ -75,8 +75,24 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: "",
     },
+    total_experience: {
+      type: String,
+      default: "",
+    },
+    previous_company_name: {
+      type: String,
+      default: "",
+    },
     user_birth_date: {
       type: Date,
+      default: "",
+    },
+    gender: {
+      type: String,
+      default: "",
+    },
+    marital_status: {
+      type: String,
       default: "",
     },
     last_login: {
@@ -111,7 +127,23 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    total_leaves: {
+      type: String,
+      default: '',
+    },
+    probation_period: {
+      type: String,
+      default: '',
+    },
     email: {
+      type: String,
+      lowercase: true,
+      unique: true,
+      required: [true, "can't be blank"],
+      match: [/\S+@\S+\.\S+/, "is invalid"],
+      index: true,
+    },
+    personal_email: {
       type: String,
       lowercase: true,
       unique: true,
@@ -126,6 +158,10 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    updated_by_id: {
+      type: String,
+      default: '',
+    }
   },
   { timestamps: true , strict: false}
 );

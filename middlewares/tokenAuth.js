@@ -2,10 +2,10 @@ import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../config/environmentVariables.js";
 import jsonResponse from "../utils/json-response.js";
 import responseCodes from "../helpers/response-codes.js";
-import { successMessages, errorMessages } from "../utils/response-message.js";
+import { errorMessages } from "../utils/response-message.js";
 
 export const verifyToken = (req, res, next) => {
-  console.log('req>>>>', req.body);
+  console.log("req>>>>", req.body);
   const token =
     req.body.token || req.query.token || req.headers["x-access-token"];
   if (!token) {
