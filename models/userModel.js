@@ -135,6 +135,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    is_probation_period_over: {
+      type: Boolean,
+      default: false,
+    },
     email: {
       type: String,
       lowercase: true,

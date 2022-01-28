@@ -25,16 +25,22 @@ import documentRoute from "./routes/documentRoute.js";
 import leaveRoute from "./routes/leaveRoute.js";
 import holidayRoute from "./routes/holidayRoute.js";
 import dashboardRoute from "./routes/dashboardRoute.js";
+import jsonResponse from "./utils/json-response.js";
 // api calls
 app.use("/api/user/", userRoute);
 app.use("/api/document/", documentRoute);
 app.use("/api/leave/", leaveRoute);
 app.use("/api/holiday/", holidayRoute);
 app.use("/api/dashboard", dashboardRoute);
+app.use("/api/dateTime", (req, res) => {
+  // Server Time API
+  var dateTime = new Date();
+  return res.status(200).json({ dateTime });
+});
 // error handling
-app.get("/", (req, res) => {	
-  res.status(200).send("Welcome to ems-backend!");	
-});	
+app.get("/", (req, res) => {
+  res.status(200).send("Welcome to ems-backend!");
+});
 
 app.use(notFound);
 app.use(errorHandler);

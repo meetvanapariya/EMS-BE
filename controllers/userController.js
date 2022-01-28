@@ -61,7 +61,7 @@ export const registerUser = async (req, res) => {
         const newUser = await User.create({
           first_name,
           last_name,
-          username: `${first_name} ${last_name}`,
+          username: `${first_name} + '' +  ${last_name}`,
           user_role,
           user_role_id,
           current_address,
@@ -370,7 +370,7 @@ export const updateUser = async (req, res) => {
   try {
     const file = req.file;
     const { userId } = req.params;
-    const  userData  = req.body;
+    const userData = req.body;
     const userInfo = JSON.parse(JSON.stringify(userData));
     // console.log(userInfo);
     // if (userInfo.constructor === Object && Object.keys(userInfo).length === 0) {
@@ -386,7 +386,7 @@ export const updateUser = async (req, res) => {
       //checking if user is paranoid then return not found message to client
       if (err || !user.paranoid == false) {
         return res.json({
-          error: '',
+          error: "",
           payload: {},
           message: "User not found",
           status: 400,

@@ -8,7 +8,6 @@ import moment from "moment";
 export const addLeave = async (req, res) => {
   const {
     user_id,
-    email,
     username,
     leave_type,
     from_date,
@@ -19,6 +18,7 @@ export const addLeave = async (req, res) => {
     approved_by_id,
     leave_day_type,
     status,
+    date,
     user_role,
   } = req.body;
   if (
@@ -41,7 +41,7 @@ export const addLeave = async (req, res) => {
   }
   const newLeave = new Leave({
     user_id,
-    email,
+    date,
     username,
     leave_type,
     from_date,
@@ -200,14 +200,26 @@ export const getCurrentLastLeave = async (req, res) => {
 
 
 export const filterAdminLeave = (req, res) => {
-  // const { username, from_date, to_date, status, leave_type } = req.params;
+  console.log("req", req.body);
   var query = {};
-  if (req.body.from_date) query.from_date = { $gt: req.body.from_date };
-  if (req.body.to_date) query.to_date = { $lt: req.body.to_date };
   if (req.body.leave_type) query.leave_type = { $eq: req.body.leave_type };
   if (req.body.username) query.username = { $eq: req.body.username };
   if (req.body.status) query.status = { $eq: req.body.status };
 
+  var from_date = req.body.from_date;
+  var to_date = req.body.to_date;
+  from_date || to_date
+    ? (query.date = {
+        $elemMatch:
+          from_date && to_date
+            ? { $gte: from_date, $lte: to_date }
+            : from_date
+            ? { $gte: from_date }
+            : to_date && { $lte: to_date },
+      })
+    : "";
+
+  console.log("query", query);
   Leave.find(query)
     .then((leaves) => {
       return jsonResponse(
@@ -227,18 +239,59 @@ export const getLeaveCount = async (req, res) => {
   const user = await User.findById(user_id);
   let user_emp_date = user.employment_start_date;
   let probation_period = user.probation_period;
+  let is_probation_period_over = user.is_probation_period_over;
   let current_date = new Date();
-  let diff_time = current_date - user_emp_date;
-  let diff_days = diff_time / (1000 * 3600 * 24);
-  console.log(diff_days);
-  console.log(probation_period);
+  let total_wroking_time = current_date - user_emp_date;
+  let total_working_days = total_wroking_time / (1000 * 3600 * 24);
+  let after_probation_over_working_days = total_working_days - (30 * probation_period);
+  let current_year_first_date = new Date(new Date().getFullYear(), 0, 1);
+  var leaves_after_probation_over = 0 ;
+  var userLeaveList = [];
+  var response ; 
+  // if user completed probation period
+  if(after_probation_over_working_days >= 1){
+    //check total users worked days
+    let total_working_days_inc_probation = (current_date - user_emp_date ) / (1000 * 3600 * 24);
+    let total_leaves = Math.ceil(total_working_days_inc_probation / 30);
+    //total leaves of users
+    leaves_after_probation_over = total_leaves - probation_period;
+    
+    //approved leave from past to cal final aval leave
+    userLeaveList = await Leave.find({ user_id: user_id , leave_type : {$ne : "loss_of_pay"} , status : {$in : ["approved","partial_approved"]} });
+    let count = 0;
+    const days = userLeaveList.map(leave => count+=parseInt(leave.number_of_days) );
+    let ava_leave = 0;
+    ava_leave = leaves_after_probation_over - days[0];
+    if(is_probation_period_over === true){
+      ava_leave = 0;
+    }
+    response = {
+        "total_leave" : leaves_after_probation_over,
+        "used_leave" : days[0],
+        "available_leave" : ava_leave ,
+    }
+    await User.findByIdAndUpdate({ _id: user_id },{ total_leaves : ava_leave });
+  }else{
+    return jsonResponse(res, responseCodes.Invalid, '', {})
+  }
       return jsonResponse(
         res,
         responseCodes.OK,
         errorMessages.noError,
-        user,
+        response,
         successMessages.Fetch
       );
-   
 };
 
+
+
+const monthsBtwnDates = (startDate, endDate) => {
+  startDate = new Date(startDate);
+  endDate = new Date(endDate);
+    return Math.max(
+      (endDate.getFullYear() - startDate.getFullYear()) * 12 +
+        endDate.getMonth() -
+        startDate.getMonth(),
+      0
+      
+)};

@@ -15,9 +15,16 @@ const leaveSchema = new mongoose.Schema(
     },
     leave_type: {
       type: String,
-      enum: ["casual_leave", "maternity_leave", "medical_leave", "loss_of_pay"],
+      enum: [
+        "casual_leave",
+        "maternity_leave",
+        "medical_leave",
+        "marriage_leave",
+        "loss_of_pay",
+      ],
       default: "",
     },
+    date: [],
     from_date: {
       type: Date,
       default: "",
@@ -48,16 +55,15 @@ const leaveSchema = new mongoose.Schema(
       default: "",
     },
     status: {
-      type: String,
-      enum: [
-        "new",
-        "pending",
-        "approved",
-        "declined",
-        "delete",
-        "partial_approved",
-      ],
-      default: "new",
+      // enum: [
+      //   "new",
+      //   "pending",
+      //   "approved",
+      //   "declined",
+      //   "delete",
+      //   "partial_approved",
+      // ],
+      // default: "new",
     },
     notes: {
       type: String,

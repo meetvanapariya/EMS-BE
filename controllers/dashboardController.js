@@ -1,9 +1,13 @@
+// External
+import moment from "moment";
+import jwt from "jsonwebtoken";
+
+// Internal
 import { Holiday } from "../models/holidayModel.js";
 import { Leave } from "../models/leaveModel.js";
 import { User } from "../models/userModel.js";
 import jsonResponse from "../utils/json-response.js";
 import { errorMessages, successMessages } from "../utils/response-message.js";
-import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../config/environmentVariables.js";
 
 export function getHolidays(req, res) {
@@ -28,19 +32,31 @@ export function getHolidays(req, res) {
 
 export function getBirthdays(req, res) {
   // this query will find all holidays which will be after today
-  let today = new Date();
+  let today = moment()
+    .utcOffset(0)
+    .set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
 
   User.find({ user_birth_date: { $gte: today } })
     .sort({ user_birth_date: 1 })
     .then((birthday) => {
       let birthdayList = birthday.map(
-        ({ profile_image, user_birth_date, email, username, _id }) => {
+        ({
+          profile_image,
+          user_birth_date,
+          email,
+          username,
+          _id,
+          first_name,
+          last_name,
+        }) => {
           let birthday = {
             profile_image,
             user_birth_date,
             email,
             username,
             _id,
+            first_name,
+            last_name,
           };
           return birthday;
         }
